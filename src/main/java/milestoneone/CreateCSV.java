@@ -336,7 +336,7 @@ public class CreateCSV {
 			  if (p==-1) {
 				for(int c = 0; c < mw.size(); c++)  
 					    total=total+mw.get(c); 
-			            double avg = total/ (double) mw.size();
+			            double avg = total/  mw.size();
 			            avg = approximation(mw, total, avg);
 					    p=(int) avg;
 			            mw=movingwindowmove(movingwindowsize, mw, p);
