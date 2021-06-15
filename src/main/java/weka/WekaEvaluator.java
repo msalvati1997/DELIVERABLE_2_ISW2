@@ -21,10 +21,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+
 import org.apache.commons.io.FileUtils;
 import org.json.CDL;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+
 import weka.core.converters.ConverterUtils.DataSource;
 
 public class WekaEvaluator {
@@ -56,7 +60,7 @@ public class WekaEvaluator {
 	private static final String USER_DIR = "user.dir";
 	private static final String PROJNAME1 ="OPENJPA";
 	private static final String PROJNAME2="BOOKKEEPER";
-	
+
 	@SuppressWarnings("unlikely-arg-type")
 	//walk forward iteration 
 	//ritorna una mappa che contiene training e test secondo l'algoritmo walk forward
@@ -130,8 +134,8 @@ public class WekaEvaluator {
 			t.writeBatch();
 			//
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			java.util.logging.Logger.getLogger("WekaEvaluator").log(Level.INFO, "Exception", ex);
 		}
 		return trainingandtest;
 	}
@@ -620,8 +624,9 @@ public class WekaEvaluator {
 		json2csv(js, projName);
 	}
 	catch(Exception ex) {
-		ex.printStackTrace();
+		java.util.logging.Logger.getLogger("WekaEvaluator").log(Level.INFO, "Exception", ex);
 	}
+	
      }
 	
 	@SuppressWarnings("deprecation")
