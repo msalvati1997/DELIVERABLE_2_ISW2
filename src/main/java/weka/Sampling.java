@@ -1,4 +1,6 @@
 package weka;
+import java.util.logging.Level;
+
 import weka.core.AttributeStats;
 import weka.core.Instances;
 import weka.filters.supervised.instance.Resample;
@@ -34,7 +36,7 @@ class Sampling {
 			filter.setNoReplacement(false);
 			filter.setSampleSizePercent(samplesizemajority);
 		} catch (Exception e) {
-			e.printStackTrace();
+			java.util.logging.Logger.getLogger("Sampling").log(Level.WARNING, "Exception", e);
 		}
 		return filter;
 	}
@@ -51,7 +53,8 @@ class Sampling {
 			filter.setInputFormat(data);
 			filter.setPercentage(samplesizesmote);
 		} catch (Exception e) {
-			e.printStackTrace();
+			java.util.logging.Logger.getLogger("Sampling").log(Level.WARNING, "Exception", e);
+
 		}
 		return filter;
 	}
