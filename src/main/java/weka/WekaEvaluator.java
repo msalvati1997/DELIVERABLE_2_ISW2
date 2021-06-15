@@ -9,6 +9,7 @@ import weka.core.Attribute;
 import weka.core.AttributeStats;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.WekaException;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.AttributeSelection;
 import weka.filters.supervised.instance.Resample;
@@ -132,7 +133,7 @@ public class WekaEvaluator {
 		return trainingandtest;
 	}
 	
-	public static void evaluatorandmetric(Map<Instances, Instances> trainingandtest,String projName) throws Exception {
+	public static void evaluatorandmetric(Map<Instances, Instances> trainingandtest,String projName) throws java.lang.Exception    {
 		
 		JSONArray js = new JSONArray();
 		ArrayList <Evaluation> evallist = new ArrayList<>();
