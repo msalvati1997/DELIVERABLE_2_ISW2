@@ -61,7 +61,6 @@ public class WekaEvaluator {
 	private static final String PROJNAME1 ="OPENJPA";
 	private static final String PROJNAME2="BOOKKEEPER";
 
-	@SuppressWarnings("unlikely-arg-type")
 	//walk forward iteration 
 	//ritorna una mappa che contiene training e test secondo l'algoritmo walk forward
 	
@@ -212,7 +211,7 @@ public class WekaEvaluator {
 			     info.add(trainandtest);
 			     classifier.add(RANDOM_FOREST);
 			     
-			     //SELECTION
+			     //SELECTION - BEST FIRST
 			     
 			     AttributeSelection filterselected = FeaturesSelection.selectAttributes();
 			     filterselected.setInputFormat(train);
@@ -399,226 +398,47 @@ public class WekaEvaluator {
 	    for(int i=0;i<evallist.size();i++) {  	
 	    	ArrayList<Double> infoi = info.get(i);
 	    	Evaluation eval = evallist.get(i);    	
-	        JSONObject jo2 = new JSONObject();
-	        jo2.put(DATASET, projName);
-            jo2.put(TEST_RELEASE,  infoi.get(0));
-            jo2.put(TRAINING_RELEASES,  infoi.get(1));
-            jo2.put(TRAINING, infoi.get(2));
-            jo2.put(TRAINING_DEFECTIVE, infoi.get(3));
-            jo2.put(TEST_DEFECTIVE, infoi.get(4));
-            jo2.put(CLASSIFIER2, classifier.get(i));
-            jo2.put(BALANCING, false);
-            jo2.put(FEATURE_SELECTION, false);
-            jo2.put(SENSITIVITY, false);
-            jo2.put(TP, eval.numTruePositives(1));
-            jo2.put(FP, eval.numFalsePositives(1));
-            jo2.put(TN, eval.numTrueNegatives(1));
-            jo2.put(FN, eval.numFalseNegatives(1));
-            jo2.put(TP_RATE, eval.truePositiveRate(1));
-            jo2.put(FP_RATE, eval.falsePositiveRate(1));
-            jo2.put(PRECISION,String.valueOf(eval.precision(1)));
-            jo2.put(RECALL, eval.recall(1));
-			jo2.put(F_MEASURE, String.valueOf(eval.fMeasure(1)));
-			jo2.put(AUC, eval.areaUnderROC(1));
-		    jo2.put(KAPPA, eval.kappa());
-			jo2.put(ACCURACY, eval.pctCorrect()/100);
+	        JSONObject jo2 = getjsonrow(projName, classifier, i, infoi, eval, "Default");
 			js.put(jo2);
 	    }
 	    for(int i=0;i<evallistselected.size();i++) {  	
 	    	
 	    	ArrayList<Double> infoi = infoselected.get(i);
 	    	Evaluation eval = evallistselected.get(i);    	
-	        JSONObject jo2 = new JSONObject();
-	        jo2.put(DATASET, projName);
-            jo2.put(TEST_RELEASE,  infoi.get(0));
-            jo2.put(TRAINING_RELEASES,  infoi.get(1));
-            jo2.put(TRAINING, infoi.get(2));
-            jo2.put(TRAINING_DEFECTIVE, infoi.get(3));
-            jo2.put(TEST_DEFECTIVE, infoi.get(4));
-            jo2.put(CLASSIFIER2, classifier.get(i));
-            jo2.put(BALANCING, false);
-            jo2.put(FEATURE_SELECTION, "BestFirst");
-            jo2.put(SENSITIVITY, false);
-            jo2.put(TP, eval.numTruePositives(1));
-            jo2.put(FP, eval.numFalsePositives(1));
-            jo2.put(TN, eval.numTrueNegatives(1));
-            jo2.put(FN, eval.numFalseNegatives(1));
-            jo2.put(TP_RATE, eval.truePositiveRate(1));
-            jo2.put(FP_RATE, eval.falsePositiveRate(1));
-            jo2.put(PRECISION,String.valueOf(eval.precision(1)));
-            jo2.put(RECALL, eval.recall(1));
-			jo2.put(F_MEASURE, String.valueOf(eval.fMeasure(1)));
-			jo2.put(AUC, eval.areaUnderROC(1));
-		    jo2.put(KAPPA, eval.kappa());
-			jo2.put(ACCURACY, eval.pctCorrect()/100);
+	        JSONObject jo2 = getjsonrow(projName, classifier, i, infoi, eval, "BestFirst");
 			js.put(jo2);
 	    }
       for(int i=0;i<evallistundersampling.size();i++) {  	
 	    	ArrayList<Double> infoi = infoundersampling.get(i);
 	    	Evaluation eval = evallistundersampling.get(i);    	
-	        JSONObject jo2 = new JSONObject();
-	        jo2.put(DATASET, projName);
-            jo2.put(TEST_RELEASE,  infoi.get(0));
-            jo2.put(TRAINING_RELEASES,  infoi.get(1));
-            jo2.put(TRAINING, infoi.get(2));
-            jo2.put(TRAINING_DEFECTIVE, infoi.get(3));
-            jo2.put(TEST_DEFECTIVE, infoi.get(4));
-            jo2.put(CLASSIFIER2, classifier.get(i));
-            jo2.put(BALANCING, "UnderSampling");
-            jo2.put(FEATURE_SELECTION, false);
-            jo2.put(SENSITIVITY, false);
-            jo2.put(TP, eval.numTruePositives(1));
-            jo2.put(FP, eval.numFalsePositives(1));
-            jo2.put(TN, eval.numTrueNegatives(1));
-            jo2.put(FN, eval.numFalseNegatives(1));
-            jo2.put(TP_RATE, eval.truePositiveRate(1));
-            jo2.put(FP_RATE, eval.falsePositiveRate(1));
-            jo2.put(PRECISION,String.valueOf(eval.precision(1)));
-            jo2.put(RECALL, eval.recall(1));
-			jo2.put(F_MEASURE, String.valueOf(eval.fMeasure(1)));
-			jo2.put(AUC, eval.areaUnderROC(1));
-		    jo2.put(KAPPA, eval.kappa());
-			jo2.put(ACCURACY, eval.pctCorrect()/100);
+	        JSONObject jo2 = getjsonrow(projName, classifier, i, infoi, eval, "Undersampling");
 			js.put(jo2);
 	    }
       for(int i=0;i<evallistoversampling.size();i++) {  	
 	    	ArrayList<Double> infoi = infooversampling.get(i);
 	    	Evaluation eval = evallistoversampling.get(i);    	
-	        JSONObject jo2 = new JSONObject();
-	        jo2.put(DATASET, projName);
-            jo2.put(TEST_RELEASE,  infoi.get(0));
-            jo2.put(TRAINING_RELEASES,  infoi.get(1));
-            jo2.put(TRAINING, infoi.get(2));
-            jo2.put(TRAINING_DEFECTIVE, infoi.get(3));
-            jo2.put(TEST_DEFECTIVE, infoi.get(4));
-            jo2.put(CLASSIFIER2, classifier.get(i));
-            jo2.put(BALANCING, "OverSampling");
-            jo2.put(FEATURE_SELECTION, false);
-            jo2.put(SENSITIVITY, false);
-            jo2.put(TP, eval.numTruePositives(1));
-            jo2.put(FP, eval.numFalsePositives(1));
-            jo2.put(TN, eval.numTrueNegatives(1));
-            jo2.put(FN, eval.numFalseNegatives(1));
-            jo2.put(TP_RATE, eval.truePositiveRate(1));
-            jo2.put(FP_RATE, eval.falsePositiveRate(1));
-            jo2.put(PRECISION,String.valueOf(eval.precision(1)));
-            jo2.put(RECALL, eval.recall(1));
-			jo2.put(F_MEASURE, String.valueOf(eval.fMeasure(1)));
-			jo2.put(AUC, eval.areaUnderROC(1));
-		    jo2.put(KAPPA, eval.kappa());
-			jo2.put(ACCURACY, eval.pctCorrect()/100);
+	        JSONObject jo2 = getjsonrow(projName, classifier, i, infoi, eval, "OverSampling");
+
 			js.put(jo2);
 	    }      
       for(int i=0;i<evallistsmote.size();i++) {  	
 	      ArrayList<Double> infoi = infooversampling.get(i);
 	  	  Evaluation eval = evallistoversampling.get(i);    	
-	      JSONObject jo2 = new JSONObject();
-          jo2.put(DATASET, projName);
-          jo2.put(TEST_RELEASE,  infoi.get(0));
-          jo2.put(TRAINING_RELEASES,  infoi.get(1));
-          jo2.put(TRAINING, infoi.get(2));
-          jo2.put(TRAINING_DEFECTIVE, infoi.get(3));
-          jo2.put(TEST_DEFECTIVE, infoi.get(4));
-          jo2.put(CLASSIFIER2, classifier.get(i));
-          jo2.put(BALANCING, "SMOTE");
-          jo2.put(FEATURE_SELECTION, false);
-          jo2.put(SENSITIVITY, false);
-          jo2.put(TP, eval.numTruePositives(1));
-          jo2.put(FP, eval.numFalsePositives(1));
-          jo2.put(TN, eval.numTrueNegatives(1));
-          jo2.put(FN, eval.numFalseNegatives(1));
-          jo2.put(TP_RATE, eval.truePositiveRate(1));
-          jo2.put(FP_RATE, eval.falsePositiveRate(1));
-          jo2.put(PRECISION,String.valueOf(eval.precision(1)));
-          jo2.put(RECALL, eval.recall(1));
-		  jo2.put(F_MEASURE, String.valueOf(eval.fMeasure(1)));
-		  jo2.put(AUC, eval.areaUnderROC(1));
-		  jo2.put(KAPPA, eval.kappa());
-		  jo2.put(ACCURACY, eval.pctCorrect()/100);
+	        JSONObject jo2 = getjsonrow(projName, classifier, i, infoi, eval, "Smote");
+
 	      js.put(jo2);
 	    }      
       for(int i=0;i<evallisttr.size();i++) {  	
 	      ArrayList<Double> infoi = infotr.get(i);
 	  	  Evaluation eval = evallisttr.get(i);    	
-	      JSONObject jo2 = new JSONObject();
-          jo2.put(DATASET, projName);
-          jo2.put(TEST_RELEASE,  infoi.get(0));
-          jo2.put(TRAINING_RELEASES,  infoi.get(1));
-          jo2.put(TRAINING, infoi.get(2));
-          jo2.put(TRAINING_DEFECTIVE, infoi.get(3));
-          jo2.put(TEST_DEFECTIVE, infoi.get(4));
-          jo2.put(CLASSIFIER2, classifier.get(i));
-          jo2.put(BALANCING, false);
-          jo2.put(FEATURE_SELECTION, false);
-          jo2.put(SENSITIVITY, "SensitiveThreshold");
-          jo2.put(TP, eval.numTruePositives(1));
-          jo2.put(FP, eval.numFalsePositives(1));
-          jo2.put(TN, eval.numTrueNegatives(1));
-          jo2.put(FN, eval.numFalseNegatives(1));
-          jo2.put(TP_RATE, eval.truePositiveRate(1));
-          jo2.put(FP_RATE, eval.falsePositiveRate(1));
-          jo2.put(PRECISION,String.valueOf(eval.precision(1)));
-          jo2.put(RECALL, eval.recall(1));
-		  jo2.put(F_MEASURE, String.valueOf(eval.fMeasure(1)));
-		  jo2.put(AUC, eval.areaUnderROC(1));
-		  jo2.put(KAPPA, eval.kappa());
-		  jo2.put(ACCURACY, eval.pctCorrect()/100);
+	        JSONObject jo2 = getjsonrow(projName, classifier, i, infoi, eval, "SensitiveThreshold");
+
 	      js.put(jo2);
 	    }     
-      for(int i=0;i<evallisttr.size();i++) {  	
-	      ArrayList<Double> infoi = infotr.get(i);
-	  	  Evaluation eval = evallisttr.get(i);    	
-	      JSONObject jo2 = new JSONObject();
-          jo2.put(DATASET, projName);
-          jo2.put(TEST_RELEASE,  infoi.get(0));
-          jo2.put(TRAINING_RELEASES,  infoi.get(1));
-          jo2.put(TRAINING, infoi.get(2));
-          jo2.put(TRAINING_DEFECTIVE, infoi.get(3));
-          jo2.put(TEST_DEFECTIVE, infoi.get(4));
-          jo2.put(CLASSIFIER2, classifier.get(i));
-          jo2.put(BALANCING, false);
-          jo2.put(FEATURE_SELECTION, false);
-          jo2.put(SENSITIVITY, "SensitiveThreshold");
-          jo2.put(TP, eval.numTruePositives(1));
-          jo2.put(FP, eval.numFalsePositives(1));
-          jo2.put(TN, eval.numTrueNegatives(1));
-          jo2.put(FN, eval.numFalseNegatives(1));
-          jo2.put(TP_RATE, eval.truePositiveRate(1));
-          jo2.put(FP_RATE, eval.falsePositiveRate(1));
-          jo2.put(PRECISION,String.valueOf(eval.precision(1)));
-          jo2.put(RECALL, eval.recall(1));
-		  jo2.put(F_MEASURE, String.valueOf(eval.fMeasure(1)));
-		  jo2.put(AUC, eval.areaUnderROC(1));
-		  jo2.put(KAPPA, eval.kappa());
-		  jo2.put(ACCURACY, eval.pctCorrect()/100);
-	      js.put(jo2);
-	    }
       for(int i=0;i<evallistlr.size();i++) {  
 	      ArrayList<Double> infoi = infolr.get(i);
 	  	  Evaluation eval = evallistlr.get(i);    	
-	      JSONObject jo2 = new JSONObject();
-          jo2.put(DATASET, projName);
-          jo2.put(TEST_RELEASE, infoi.get(0));
-          jo2.put(TRAINING_RELEASES, infoi.get(1));
-          jo2.put(TRAINING, infoi.get(2));
-          jo2.put(TRAINING_DEFECTIVE, infoi.get(3));
-          jo2.put(TEST_DEFECTIVE, infoi.get(4));
-          jo2.put(CLASSIFIER2, classifier.get(i));
-          jo2.put(BALANCING, false);
-          jo2.put(FEATURE_SELECTION, false);
-          jo2.put(SENSITIVITY, "SensitiveLearning");
-          jo2.put(TP, eval.numTruePositives(1));
-          jo2.put(FP, eval.numFalsePositives(1));
-          jo2.put(TN, eval.numTrueNegatives(1));
-          jo2.put(FN, eval.numFalseNegatives(1));
-          jo2.put(TP_RATE, eval.truePositiveRate(1));
-          jo2.put(FP_RATE, eval.falsePositiveRate(1));
-          jo2.put(PRECISION,String.valueOf(eval.precision(1)));
-          jo2.put(RECALL, eval.recall(1));
-		  jo2.put(F_MEASURE, String.valueOf(eval.fMeasure(1)));
-		  jo2.put(AUC, eval.areaUnderROC(1));
-		  jo2.put(KAPPA, eval.kappa());
-		  jo2.put(ACCURACY, eval.pctCorrect()/100);
+	      JSONObject jo2 = getjsonrow(projName, classifier, i, infoi, eval, "SensitiveLearning");
 	      js.put(jo2);
 	    }   
 		json2csv(js, projName);
@@ -628,6 +448,47 @@ public class WekaEvaluator {
 	}
 	
      }
+
+	private static JSONObject getjsonrow(String projName, ArrayList<String> classifier, int i, ArrayList<Double> infoi,
+			Evaluation eval, String string) {
+		
+		JSONObject jo2 = new JSONObject();
+		jo2.put(DATASET, projName);
+		jo2.put(TEST_RELEASE,  infoi.get(0));
+		jo2.put(TRAINING_RELEASES,  infoi.get(1));
+		jo2.put(TRAINING, infoi.get(2));
+		jo2.put(TRAINING_DEFECTIVE, infoi.get(3));
+		jo2.put(TEST_DEFECTIVE, infoi.get(4));
+		jo2.put(CLASSIFIER2, classifier.get(i));
+		jo2.put(BALANCING, false);
+		jo2.put(SENSITIVITY, false);
+		jo2.put(FEATURE_SELECTION, false);
+		if(string.equals("SensitiveLearning" ) || string.equals("SensitiveThreshold")) {
+			jo2.put(SENSITIVITY, string);
+
+		}
+		if(string.equals("UnderSampling" ) || string.equals("OverSampling") || string.equals("SMOTE")) {
+			jo2.put(BALANCING, string);
+
+		}
+		if(string.equals("BestFirst")) {
+			jo2.put(FEATURE_SELECTION, string);
+
+		}
+		jo2.put(TP, eval.numTruePositives(1));
+		jo2.put(FP, eval.numFalsePositives(1));
+		jo2.put(TN, eval.numTrueNegatives(1));
+		jo2.put(FN, eval.numFalseNegatives(1));
+		jo2.put(TP_RATE, eval.truePositiveRate(1));
+		jo2.put(FP_RATE, eval.falsePositiveRate(1));
+		jo2.put(PRECISION,String.valueOf(eval.precision(1)));
+		jo2.put(RECALL, eval.recall(1));
+		jo2.put(F_MEASURE, String.valueOf(eval.fMeasure(1)));
+		jo2.put(AUC, eval.areaUnderROC(1));
+		jo2.put(KAPPA, eval.kappa());
+		jo2.put(ACCURACY, eval.pctCorrect()/100);
+		return jo2;
+	}
 	
 	@SuppressWarnings("deprecation")
 	public static  void json2csv(JSONArray array,String projname) throws IOException {         
