@@ -102,45 +102,66 @@ public class CollectFilesInfo {
 			  String[] splitted = classname.split(":");
 			  String[] names = splitted[2].split("->");
 		      if(names.length==1) {
-				  JSONObject js = new JSONObject(); 
-				  js.put(PERSONIDENT,auth);
-				  js.put(RELEASE, release);
-				  js.put(FILENAME,names[0].trim());
-				  js.put(ADDEDLINES,addedl);
-				  js.put(DELETELINES,delete1);
-				  js.put(CHANGESLINE, changes);
-				  filenames.add(names[0].trim());
-				  js.put("Opt", classname.split(":")[1].trim()); 
+				  JSONObject js = getjsoncsv2(filenames, auth, release, classname, addedl, delete1, changes, names); 
 				  aggregate.put(js);
 			}
 			  if(names.length==2) {
 				  if (classname.split(":")[1].endsWith("E")) {
-				  JSONObject js = new JSONObject(); 
-				  js.put(RELEASE, release);
-				  js.put(PERSONIDENT,auth);
-				  js.put(FILENAME,names[0].trim());
-				  js.put(ADDEDLINES,addedl);
-				  js.put(DELETELINES,delete1);
-				  js.put(CHANGESLINE, changes);
-				  filenames.add(names[0].trim());
-				  js.put("Opt", classname.split(":")[1].trim()); 
+				  JSONObject js = getjsoncsv(filenames, auth, release, classname, addedl, delete1, changes, names); 
 				  aggregate.put(js);
 				  }
 				  if (classname.split(":")[1].endsWith("D")) {
-					  JSONObject js = new JSONObject(); 
-					  js.put(RELEASE, release);
-					  js.put(PERSONIDENT,auth);
-					  js.put(FILENAME,names[1].trim());
-					  js.put(ADDEDLINES,addedl);
-					  js.put(DELETELINES,delete1);
-					  js.put(CHANGESLINE, changes);
-					  filenames.add(names[1].trim());
-					  js.put("Opt", classname.split(":")[1].trim()); 
+					  JSONObject js = getjsoncsv3(filenames, auth, release, classname, addedl, delete1, changes, names); 
 					  aggregate.put(js);
 				  }
 			   }
   }
 		return aggregate;
+	}
+
+
+	private static JSONObject getjsoncsv3(ArrayList<String> filenames, String auth, Integer release, String classname,
+			int addedl, int delete1, int changes, String[] names) {
+		JSONObject js = new JSONObject(); 
+		  js.put(RELEASE, release);
+		  js.put(PERSONIDENT,auth);
+		  js.put(FILENAME,names[1].trim());
+		  js.put(ADDEDLINES,addedl);
+		  js.put(DELETELINES,delete1);
+		  js.put(CHANGESLINE, changes);
+		  filenames.add(names[1].trim());
+		  js.put("Opt", classname.split(":")[1].trim());
+		return js;
+	}
+
+
+	private static JSONObject getjsoncsv2(ArrayList<String> filenames, String auth, Integer release, String classname,
+			int addedl, int delete1, int changes, String[] names) {
+		JSONObject js = new JSONObject(); 
+		  js.put(PERSONIDENT,auth);
+		  js.put(RELEASE, release);
+		  js.put(FILENAME,names[0].trim());
+		  js.put(ADDEDLINES,addedl);
+		  js.put(DELETELINES,delete1);
+		  js.put(CHANGESLINE, changes);
+		  filenames.add(names[0].trim());
+		  js.put("Opt", classname.split(":")[1].trim());
+		return js;
+	}
+
+
+	private static JSONObject getjsoncsv(ArrayList<String> filenames, String auth, Integer release, String classname,
+			int addedl, int delete1, int changes, String[] names) {
+		JSONObject js = new JSONObject(); 
+		  js.put(RELEASE, release);
+		  js.put(PERSONIDENT,auth);
+		  js.put(FILENAME,names[0].trim());
+		  js.put(ADDEDLINES,addedl);
+		  js.put(DELETELINES,delete1);
+		  js.put(CHANGESLINE, changes);
+		  filenames.add(names[0].trim());
+		  js.put("Opt", classname.split(":")[1].trim());
+		return js;
 	}
 	
 	
