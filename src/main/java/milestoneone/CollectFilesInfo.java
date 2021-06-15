@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,7 +57,8 @@ public class CollectFilesInfo {
 			try {
 				files = json.getJSONArray("DiffFiles");
 			} catch (Exception e) {
-				e.printStackTrace();
+				java.util.logging.Logger.getLogger("CollectFilesInfo").log(Level.WARNING, "Exception", e);
+
 			}
 			  Object committime = json.get("CommitTime");
 			  String auth = json.getString(PERSONIDENT);

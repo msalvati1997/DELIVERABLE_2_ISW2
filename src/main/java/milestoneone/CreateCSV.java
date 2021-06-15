@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.logging.Level;
+
 import org.apache.commons.io.FileUtils;
 import org.json.CDL;
 import org.json.JSONArray;
@@ -156,7 +158,7 @@ public class CreateCSV {
 			        min =resu2.get(0);
 			        fv=max+1;
 		        } catch (Exception e) {
-		        	e.printStackTrace();
+					java.util.logging.Logger.getLogger("CreateCSV").log(Level.WARNING, "Exception", e);
 				}
 		    	int addingrelease = 0;
 	        	int deleterelease = 0;
