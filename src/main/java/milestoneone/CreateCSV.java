@@ -206,11 +206,11 @@ public class CreateCSV {
 		for(int u=0;u<classexistence.size();u++) {
 			int release = classexistence.get(u);
 			if(resu2.contains(release)) {
-				  JSONObject row = extractrowinfo1(projname, filename, featuresfile,release);
+				  JSONObject row = extractrowinfo(projname, filename, featuresfile,release,true);
 				  newrows.put(row);
 			}
 			else {
-				  JSONObject row = extractrowinfo2(projname, filename, featuresfile, release);
+				  JSONObject row = extractrowinfo(projname, filename, featuresfile, release,false);
 				  newrows.put(row);
 		   }
 		}
@@ -376,119 +376,7 @@ public class CreateCSV {
 		}
 		return avg;
 	}
-	private static JSONObject extractrowinfo1(String projname, String filename, JSONObject featuresfile, int release)
-			throws IOException {
-    	ArrayList<Integer> releaseages = new ArrayList<>();
-		ArrayList<Integer> addedloc = new ArrayList<>();
-		ArrayList<Integer> sizeloc = new ArrayList<>();
-		String query;
-		ReadContext ctx;
-		List<Object> resu;
-		JSONObject versioninfo;
-		DocumentContext ctx2;
-		JSONObject row = new JSONObject();
-		  row.put(PROJECT, projname);
-		  row.put(CLASS, filename);
-		  row.put(VERSION, release);
-		  row.put(BUGGYNESS, true);
-		  /// 1 FEATURES - NUMERO AUTORI NELLA DETERMINATA RELEASE
-		  query = FILERELEASE+release+")]['auth']";
-		  ctx = JsonPath.parse(featuresfile.toString());
-		  ArrayList <String> authors = ctx.read(query);
-		  LinkedHashSet<String> hashSets = new LinkedHashSet<>(authors);
-		  ArrayList<String> authors1 = new ArrayList<>(hashSets);         
-		  int nauth= authors1.size();
-		  row.put("Nauth", nauth);
-		  /// 2 FEATURES - NUMERO DI REVISIONI 
-		  int nr = authors.size();
-		  row.put("NR", nr);
-		  /// 3 FEATURES - Churn
-		  query = FILERELEASE+release+")]['changes']";
-		  ctx = JsonPath.parse(featuresfile.toString());
-		  ArrayList <Integer> changes = ctx.read(query);
-		  int sum=0;
-		  for(int v=0;v<changes.size();v++) {
-			  sum=sum+changes.get(v);
-		  }
-		  sizeloc.add(sum);
-		  row.put("Churn", sum);
-		  //4 FEATURES :  Loc ADDED 
-		  query = FILERELEASE+release+")]['AddedLines']";
-		  ArrayList <Integer> addedlines = ctx.read(query);
-		  int sumlocadded=0;
-		  for(int v=0;v<addedlines.size();v++) {
-			  sumlocadded+=addedlines.get(v);
-		  }
-		  addedloc.add(sumlocadded);
-		  row.put("LOC Added", sumlocadded);
-		  //5 FEATURES :  MAX LOC Added
-		  int maxlocadded=0;
-		  if(!addedlines.isEmpty()) {
-			  maxlocadded=Collections.max(addedlines);
-		  }
-		  row.put("MAX LOC Added",maxlocadded );
-		  //6 FEATURES :  AVG LOC Added
-		  int avglocadded=sumlocadded;
-		
-		  if(!addedlines.isEmpty()) {
-		    avglocadded=sumlocadded/addedlines.size();
-		    if(sumlocadded%addedlines.size()>=5) {
-				  avglocadded=avglocadded+1; // approssimazione
-		        }
-		  }
-		  row.put("AVG LOC Added",avglocadded );
 
-		  //7 FEATURES : LOC Touched 
-		  query = FILERELEASE+release+")]['DeleteLines']";
-		  ctx = JsonPath.parse(featuresfile.toString());
-		  ArrayList <Integer> deletelines = ctx.read(query);
-		  int loctouched=sumlocadded;
-		  for(int v=0;v<deletelines.size();v++) {
-			  loctouched-=deletelines.get(v);
-		  }
-		  row.put("LOC TOUCHED",loctouched );
-
-		  //8 FEATURES : Max Churn 
-		  ArrayList<Integer> churncomputation = new ArrayList<>();
-		  int maxchurn=0;
-		  for(int i=0;i<deletelines.size();i++) {
-			  int churni= addedlines.get(i)+deletelines.get(i);
-			  churncomputation.add(churni);
-		  }
-		  if(!churncomputation.isEmpty()) {
-			   maxchurn =Collections.max(churncomputation);
-		  }
-		  row.put("Max Churn",maxchurn);
-		  // 9 FEATURES : Average Churn 
-		  int avgchurn=sum;  //sum � il churn over revisions - nel caso la revisions sia 1 p pari al churn medio
-		  if(!churncomputation.isEmpty()) {
-			  avgchurn=sum/churncomputation.size();
-			if(sum%churncomputation.size()>=5) {
-				avgchurn=avgchurn+1; // approssimazione
-		        }
-		  }
-
-		  row.put("AVG CHURN",avgchurn );
-		  //10 FEATURES: Age - versions age in weeks
-		  query= "$.VersionInfo[?(@.Index=="+release+")]['Age']";
-		  versioninfo = parseJSONFile(projname+VERSION_INFO_JSON);
-		  ctx2 = JsonPath.parse(versioninfo.toString());
-		  resu = ctx2.read(query);
-		  Object age = resu.get(0);
-		  row.put("Age", resu.get(0));
-		  releaseages.add((Integer) age);
-		  //11 FEATURES Weighted Age  
-		  
-		  row.put("Weighted Age",getweightedage(releaseages, addedloc));
-
-		  //12 FEATURES Size
-		  int sumsize=0;
-		  for(int i=0;i<sizeloc.size();i++) {
-			  sumsize=sumsize+sizeloc.get(i);
-		  }
-		  row.put("Size", sumsize);
-		return row;
-	}
 	private static int getweightedage(ArrayList<Integer> releaseages, ArrayList<Integer> addedloc) {
 		int sumages=0;
 		  int num=0;
@@ -512,8 +400,8 @@ public class CreateCSV {
 			  }		
 		  return weightedage;
 	}
-	private static JSONObject extractrowinfo2(String projname, String filename, JSONObject featuresfile,
-			 int release)
+	private static JSONObject extractrowinfo(String projname, String filename, JSONObject featuresfile,
+			 int release, boolean boo)
 			throws IOException {
     	ArrayList<Integer> releaseages = new ArrayList<>();
 		ArrayList<Integer> addedloc = new ArrayList<>();
@@ -527,7 +415,7 @@ public class CreateCSV {
 		  row.put(PROJECT, projname);
 		  row.put(CLASS, filename);
 		  row.put(VERSION, release);
-		  row.put(BUGGYNESS, false);
+		  row.put(BUGGYNESS, boo);
 		  /// 1 FEATURES - NUMERO AUTORI NELLA DETERMINATA RELEASE
 		  query = FILERELEASE+release+")]['auth']";
 		  ctx = JsonPath.parse(featuresfile.toString());
