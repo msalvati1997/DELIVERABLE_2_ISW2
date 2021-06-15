@@ -88,7 +88,7 @@ public class WekaEvaluator {
 			 testingreleases.clear();
 			 trainingreleases.add(startversion);
 			 testingreleases.add(startversion+1);
-			 startversion=startversion+1;
+			 startversion+=1;
 			 int index=-1;
 			 int indextest=0;
 			 for (int i = 0; i < dataset.numInstances(); i++) {
@@ -128,14 +128,9 @@ public class WekaEvaluator {
 			t.setInstances(test);
 			t.setFile(new File(System.getProperty(USER_DIR)+"\\src\\main\\resources\\Testing_"+j+projName+".arff"));
 			t.writeBatch();
-			return trainingandtest;
 			//
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return trainingandtest;
@@ -625,7 +620,7 @@ public class WekaEvaluator {
 		json2csv(js, projName);
 	}
 	catch(Exception ex) {
-		
+		ex.printStackTrace();
 	}
      }
 	
@@ -646,7 +641,7 @@ public class WekaEvaluator {
 		
 	}
 	
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args)  {
 		String proj2finale= System.getProperty(USER_DIR)+"\\src\\main\\resources\\BOOKKEEPER.arff";
     	evaluatorandmetric(walkforward(proj2finale, PROJNAME2), PROJNAME2);
     	String proj1final= System.getProperty(USER_DIR)+"\\src\\main\\resources\\OPENJPA.arff";
