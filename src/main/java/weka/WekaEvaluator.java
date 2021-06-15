@@ -9,7 +9,6 @@ import weka.core.Attribute;
 import weka.core.AttributeStats;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.WekaException;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.AttributeSelection;
 import weka.filters.supervised.instance.Resample;
@@ -62,79 +61,89 @@ public class WekaEvaluator {
 	//walk forward iteration 
 	//ritorna una mappa che contiene training e test secondo l'algoritmo walk forward
 	
-	public static Map<Instances, Instances> walkforward(String path, String projName) throws Exception {
-		
-		ArrayList  <Instances> trainlist= new ArrayList<>();
-		ArrayList  <Instances> testlist= new ArrayList<>();
+	public static Map<Instances, Instances> walkforward(String path, String projName)  {
+		Map<Instances, Instances> trainingandtest = new HashMap<>();
 
-	    Map<Instances, Instances> trainingandtest = new HashMap<>();
-		DataSource source = new DataSource(path);
-		Instances dataset = source.getDataSet();
-		//set class index to the last attribute
-		dataset.setClassIndex(dataset.numAttributes()-1);
-		// get attributes list 
-	    ArrayList <Attribute> attributeslist= new ArrayList<>();
-	    for(int i=0; i<dataset.numAttributes();i++) {
-	    	attributeslist.add(dataset.attribute(i));
-	    }
-	    //creates the lists that containts releases for training and test
-	    double lastversion =dataset.instance(dataset.numInstances()-1).value(0);
-	    double startversion = 1;
-	    double numberofiteration = lastversion-1;
-	    ArrayList <Double> trainingreleases = new  ArrayList<>();
-	    ArrayList <Double> testingreleases = new  ArrayList<>();
-	    
-	    for (int j=0;j<numberofiteration;j++) {
-	     testingreleases.clear();
-	     trainingreleases.add(startversion);
-	     testingreleases.add(startversion+1);
-	     startversion=startversion+1;
-	     int index=-1;
-	 	 int indextest=0;
-		 for (int i = 0; i < dataset.numInstances(); i++) {
-			    double curr = dataset.instance(i).value(0);
-			    if(trainingreleases.contains(curr)) {
-			    	 index=i+1;
-			    }
-			    if(testingreleases.contains(curr)) {
-			    	indextest=i+1;
-			    }
+		try {
+			ArrayList  <Instances> trainlist= new ArrayList<>();
+			ArrayList  <Instances> testlist= new ArrayList<>();
+
+			DataSource source = new DataSource(path);
+			Instances dataset = source.getDataSet();
+			//set class index to the last attribute
+			dataset.setClassIndex(dataset.numAttributes()-1);
+			// get attributes list 
+			ArrayList <Attribute> attributeslist= new ArrayList<>();
+			for(int i=0; i<dataset.numAttributes();i++) {
+				attributeslist.add(dataset.attribute(i));
+			}
+			//creates the lists that containts releases for training and test
+			double lastversion =dataset.instance(dataset.numInstances()-1).value(0);
+			double startversion = 1;
+			double numberofiteration = lastversion-1;
+			ArrayList <Double> trainingreleases = new  ArrayList<>();
+			ArrayList <Double> testingreleases = new  ArrayList<>();
+			
+			for (int j=0;j<numberofiteration;j++) {
+			 testingreleases.clear();
+			 trainingreleases.add(startversion);
+			 testingreleases.add(startversion+1);
+			 startversion=startversion+1;
+			 int index=-1;
+			 int indextest=0;
+			 for (int i = 0; i < dataset.numInstances(); i++) {
+				    double curr = dataset.instance(i).value(0);
+				    if(trainingreleases.contains(curr)) {
+				    	 index=i+1;
+				    }
+				    if(testingreleases.contains(curr)) {
+				    	indextest=i+1;
+				    }
+			}
+			List<Instance> traininstances= dataset.subList(0, index);
+			List<Instance> testinstances= dataset.subList(index+1, indextest);
+			
+			int indx = j+1;
+			Instances train = new Instances("Train-"+indx+"-"+projName, attributeslist, traininstances.size());
+			Instances test = new Instances("Test"+indx+"-"+projName, attributeslist, testinstances.size());
+			//
+			for(int i=0;i<traininstances.size();i++) {
+				train.add(traininstances.get(i));
+			}
+			//
+			for(int i=0;i<testinstances.size();i++) {
+				test.add(testinstances.get(i));
+			}
+			//
+			trainingandtest.put(train, test);
+			trainlist.add(train);
+			testlist.add(test);
+			//
+			ArffSaver s= new ArffSaver();
+			s.setInstances(train);
+			s.setFile(new File(System.getProperty(USER_DIR)+"\\src\\main\\resources\\Training_"+j+projName+".arff"));
+			s.writeBatch();
+			//
+			ArffSaver t= new ArffSaver();
+			t.setInstances(test);
+			t.setFile(new File(System.getProperty(USER_DIR)+"\\src\\main\\resources\\Testing_"+j+projName+".arff"));
+			t.writeBatch();
+			return trainingandtest;
+			//
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		List<Instance> traininstances= dataset.subList(0, index);
-		List<Instance> testinstances= dataset.subList(index+1, indextest);
-		
-		int indx = j+1;
-		Instances train = new Instances("Train-"+indx+"-"+projName, attributeslist, traininstances.size());
-	    Instances test = new Instances("Test"+indx+"-"+projName, attributeslist, testinstances.size());
-        //
-	    for(int i=0;i<traininstances.size();i++) {
-	    	train.add(traininstances.get(i));
-	    }
-	    //
-	    for(int i=0;i<testinstances.size();i++) {
-	    	test.add(testinstances.get(i));
-	    }
-	    //
-	    trainingandtest.put(train, test);
-	    trainlist.add(train);
-	    testlist.add(test);
-	    //
-	    ArffSaver s= new ArffSaver();
-	    s.setInstances(train);
-	    s.setFile(new File(System.getProperty(USER_DIR)+"\\src\\main\\resources\\Training_"+j+projName+".arff"));
-	    s.writeBatch();
-	    //
-	    ArffSaver t= new ArffSaver();
-	    t.setInstances(test);
-	    t.setFile(new File(System.getProperty(USER_DIR)+"\\src\\main\\resources\\Testing_"+j+projName+".arff"));
-	    t.writeBatch();
-	    //
-	    }
 		return trainingandtest;
 	}
 	
-	public static void evaluatorandmetric(Map<Instances, Instances> trainingandtest,String projName) throws java.lang.Exception    {
+	public static void evaluatorandmetric(Map<Instances, Instances> trainingandtest,String projName)   {
 		
+	try {
 		JSONArray js = new JSONArray();
 		ArrayList <Evaluation> evallist = new ArrayList<>();
 		ArrayList <ArrayList <Double>> info = new ArrayList<>();
@@ -614,6 +623,10 @@ public class WekaEvaluator {
 	      js.put(jo2);
 	    }   
 		json2csv(js, projName);
+	}
+	catch(Exception ex) {
+		
+	}
      }
 	
 	@SuppressWarnings("deprecation")
